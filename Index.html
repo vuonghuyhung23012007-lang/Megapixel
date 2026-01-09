@@ -1,0 +1,421 @@
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Megapixel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+        }
+        
+        .menu-container {
+            width: 370px;
+            background: #000000;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            position: absolute;
+            cursor: grab;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        .menu-container:active {
+            cursor: grabbing;
+        }
+        
+        .menu-container.hidden {
+            display: none;
+        }
+        
+        .toggle-icon {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            z-index: 9999;
+            transition: transform 0.3s ease;
+        }
+        
+        .toggle-icon:hover {
+            transform: scale(1.1) rotate(10deg);
+        }
+        
+        .sidebar {
+            width: 60px;
+            background: transparent;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 0;
+        }
+        
+        .sidebar-item {
+            width: 45px;
+            height: 45px;
+            margin: 10px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #1a1a1a;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .sidebar-item:hover {
+            background: #2a2a2a;
+            border-color: #00ffff;
+            transform: translateX(5px);
+        }
+        
+        .sidebar-item.active {
+            background: #00ffff;
+            border-color: #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+        }
+        
+        .sidebar-item.active .sidebar-icon {
+            color: #000;
+        }
+        
+        .sidebar-icon {
+            font-size: 18px;
+            color: #fffb00;
+            transition: color 0.3s ease;
+        }
+        
+        .main-content {
+            flex-grow: 1;
+            padding: 15px;
+            position: relative;
+        }
+        
+        .menu-header {
+            background: transparent;
+            color: #00ffff;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 22px;
+            font-weight: bold;
+            border-radius: 4px;
+            text-shadow: 0 0 10px #00ffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .menu-content {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .menu-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1a1a1a;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        
+        .menu-option:hover {
+            background: #2a2a2a;
+            border-color: #00ffff;
+            transform: translateX(3px);
+        }
+        
+        .menu-option span {
+            color: #ffffff;
+            font-family: 'serif';
+            font-weight: bold;
+            font-style: italic;
+        }
+        
+        .btn-toggle {
+            width: 70px;
+            height: 32px;
+            background: #ff4444;
+            border-radius: 6px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #cc0000;
+            z-index: 3;
+        }
+        
+        .btn-toggle::before {
+            content: '𝐎𝐅𝐅';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-toggle.active {
+            background: #00ff00;
+            border-color: #00cc00;
+        }
+        
+        .btn-toggle.active::before {
+            content: '𝐎𝐍';
+        }
+        
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: transparent;
+            pointer-events: none;
+        }
+        
+        #time-display {
+            color: #ffffff;
+            text-align: center;
+            font-size: 13px;
+            margin-top: 5px;
+            font-family: serif;
+            position: relative;
+            z-index: 2;
+        }
+</style>
+  </head>
+
+  <body>
+    <img src="https://raw.githubusercontent.com/vuonghuyhung23012007-lang/Megapixel/6f1840ecb117a3b9e289556d12a2ac9ea9435146/1767852700987.png" 
+	  alt="Toggle Menu" 
+	  class="toggle-icon" 
+	  id="toggleIcon">
+
+    <div class="menu-container" id="menu">
+	  <div class="sidebar">
+		<br><br>
+		<div class="sidebar-item active" data-section="options-speed">
+		  <i class="sidebar-icon fas fa-tachometer-alt"></i>
+		</div>
+		<br>
+	  </div>
+
+	  <div class="main-content">
+		<header class="menu-header">
+		  <span style="color: #00ffff; text-shadow: 0 0 10px #00ffff; font-family: serif; font-style: italic;">𝐌𝐞𝐠𝐚𝐩𝐢𝐱𝐞𝐥</span>
+		</header>
+		<div id="time-display"></div>
+
+		<div id="particles-js"></div>
+		
+		<div class="menu-content" id="options-speed">
+		  <div class="menu-option">
+			<span>𝐒𝐩𝐞𝐞𝐝 𝐗𝟐 [ 𝐎𝐧 & 𝐎𝐟𝐟 ]</span>
+			<div class="btn-toggle" onclick="toggleSpeed22()"></div>
+		  </div>
+		  <div class="menu-option">
+			<span>𝐒𝐩𝐞𝐞𝐝 𝐗𝟓 [ 𝐎𝐧 & 𝐎𝐟𝐟 ]</span>
+			<div class="btn-toggle" onclick="toggleSpeed55()"></div>
+		  </div>
+		  <div class="menu-option">
+			<span>𝐒𝐩𝐞𝐞𝐝 𝐗𝟖 [ 𝐎𝐧 & 𝐎𝐟𝐟 ]</span>
+			<div class="btn-toggle" onclick="toggleSpeed88()"></div>
+		  </div>
+		</div>
+	  </div>
+    </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+<script>
+        // Khai báo biến menu một lần duy nhất
+        const menu = document.getElementById('menu');
+        const toggleIcon = document.getElementById('toggleIcon');
+        
+        // Toggle menu visibility
+        toggleIcon.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+
+        //Function button speed x2
+        function setSpeed22() {
+          if (typeof h5gg !== 'undefined') {
+            h5gg.editAll('4397530849758414897', 'I64');
+          }
+        }
+
+        function disableSpeed22() {
+          if (typeof h5gg !== 'undefined') {
+            h5gg.editAll('4397530849764387586', 'I64');
+          }
+        }
+
+        function searchSpeed22() {
+          if (typeof h5gg !== 'undefined') {
+            h5gg.clearResults();
+            h5gg.searchNumber('4397530849764387586', 'I64', '0x100000000', '0x200000000');
+          }
+        }
+
+        function toggleSpeed22() {
+          const buttons = document.querySelectorAll('.menu-option .btn-toggle');
+          const button = buttons[0];
+          if (button.classList.contains('active')) {
+            disableSpeed22();
+          } else {
+            if (typeof h5gg === 'undefined' || h5gg.getResultsCount() !== 1) {
+              searchSpeed22();
+            }
+            setSpeed22();
+          }
+          button.classList.toggle('active');
+        }
+
+        //Function button speed x5
+        function setSpeed55() {
+          if (typeof h5gg !== 'undefined') {
+            h5gg.editAll('4397530849758414697', 'I64');
+          }
+        }
+
+        function disableSpeed55() {
+          if (typeof h5gg !== 'undefined') {
+            h5gg.editAll('4397530849764387586', 'I64');
+          }
+        }
+
+        function searchSpeed55() {
+          if (typeof h5gg !== 'undefined') {
+            h5gg.clearResults();
+            h5gg.searchNumber('4397530849764387586', 'I64', '0x100000000', '0x200000000');
+          }
+        }
+
+        function toggleSpeed55() {
+          const buttons = document.querySelectorAll('.menu-option .btn-toggle');
+          const button = buttons[1];
+          if (button.classList.contains('active')) {
+            disableSpeed55();
+          } else {
+            if (typeof h5gg === 'undefined' || h5gg.getResultsCount() !== 1) {
+              searchSpeed55();
+            }
+            setSpeed55();
+          }
+          button.classList.toggle('active');
+        }
+
+        //Function button speed x8
+        function setSpeed88() {
+          if (typeof h5gg !== 'undefined') {
+            h5gg.editAll('4366458311853685297', 'I64');
+          }
+        }
+
+        function disableSpeed88() {
+          if (typeof h5gg !== 'undefined') {
+            h5gg.editAll('4397530849764387586', 'I64');
+          }
+        }
+
+        function searchSpeed88() {
+          if (typeof h5gg !== 'undefined') {
+            h5gg.clearResults();
+            h5gg.searchNumber('4397530849764387586', 'I64', '0x100000000', '0x200000000');
+          }
+        }
+
+        function toggleSpeed88() {
+          const buttons = document.querySelectorAll('.menu-option .btn-toggle');
+          const button = buttons[2];
+          if (button.classList.contains('active')) {
+            disableSpeed88();
+          } else {
+            if (typeof h5gg === 'undefined' || h5gg.getResultsCount() !== 1) {
+              searchSpeed88();
+            }
+            setSpeed88();
+          }
+          button.classList.toggle('active');
+        }
+
+        // Draggable menu
+        let isDragging = false;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        menu.addEventListener('mousedown', (e) => {
+            // Không kéo nếu click vào button
+            if (e.target.classList.contains('btn-toggle') || e.target.closest('.btn-toggle')) {
+                return;
+            }
+            isDragging = true;
+            offsetX = e.clientX - menu.getBoundingClientRect().left;
+            offsetY = e.clientY - menu.getBoundingClientRect().top;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            menu.style.left = `${e.clientX - offsetX}px`;
+            menu.style.top = `${e.clientY - offsetY}px`;
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            const date = now.toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            const time = now.toLocaleTimeString('en-GB', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('time-display').innerText = `${date} | ${time}`;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // Particles.js
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: '#00ffff' },
+                opacity: { value: 0.5 },
+                size: { value: 3 },
+                line_linked: { enable: true, color: '#00ffff', opacity: 0.4 },
+                move: { enable: true, speed: 2 }
+            }
+        });
+</script>
+  </body>
+</html>
